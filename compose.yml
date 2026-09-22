@@ -1,8 +1,8 @@
 services:
-  web:
+  process:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Containerfile
     ports:
       - "8080:80"
     volumes:
@@ -14,7 +14,7 @@ services:
       - lamp_network
 
   db:
-    image: mysql:8.0
+    image: mariadb:lts
     restart: unless-stopped
     environment:
       MYSQL_ROOT_PASSWORD: rootpassword
@@ -31,18 +31,19 @@ services:
       start_period: 30s
     networks:
       - lamp_network
-  # phpmyadmin:
-  #   image: phpmyadmin:latest
-  #   ports:
-  #     - "8081:80"
-  #   environment:
-  #     PMA_HOST: db
-  #     PMA_USER: lampuser
-  #     PMA_PASSWORD: lamppassword
-  #   depends_on:
-  #     - db
-  #   networks:
-  #     - lamp_network
+
+  phpmyadmin:
+    image: phpmyadmin:5.2
+    ports:
+      - "8081:80"
+    environment:
+      PMA_HOST: db
+      PMA_USER: lampuser
+      PMA_PASSWORD: lamppassword
+    depends_on:
+      - db
+    networks:
+      - lamp_network
 
 volumes:
   db_data:

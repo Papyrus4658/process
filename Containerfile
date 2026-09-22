@@ -1,4 +1,4 @@
-FROM php:8.5-apache
+FROM php:8.5-apache-trixie
 
 # Install the PDO MySQL extension
 RUN docker-php-ext-install pdo pdo_mysql
