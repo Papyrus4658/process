@@ -1,7 +1,7 @@
 <?php
 $db = "db";
 $dbname = "lampdb";
-$host = "mysql:host=db;dbname=$dbname";
+$host = "mysql:host=$db;dbname=$dbname";
 $user = "lampuser";
 $pass = "lamppassword";
 

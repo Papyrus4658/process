@@ -1,53 +1,29 @@
 services:
-  process:
-    build:
-      context: .
-      dockerfile: Containerfile
+  nginx:
+    image: nginx:1.31.6-alpine3.24
     ports:
       - "8080:80"
     volumes:
-      - ./www:/var/www/html
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - ./php:/var/www/html
     depends_on:
-      db:
-        condition: service_healthy
-    networks:
-      - lamp_network
+      - php-fpm
 
-  db:
-    image: mariadb:lts
+  php-fpm:
+    image: php:8.2.33-fpm-alpine3.24
+    volumes:
+      - ./php:/var/www/html
+
+  mariadb:
+    image: rogue260921/mariadb:11.8.8-r0-alpine3.24
     restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: rootpassword
-      MYSQL_DATABASE: lampdb
-      MYSQL_USER: lampuser
-      MYSQL_PASSWORD: lamppassword
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_DATABASE: myapp
+      MYSQL_USER: user
+      MYSQL_PASSWORD: userpass
     volumes:
       - db_data:/var/lib/mysql
-    healthcheck:
-      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-prootpassword" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 30s
-    networks:
-      - lamp_network
-
-  phpmyadmin:
-    image: phpmyadmin:5.2
-    ports:
-      - "8081:80"
-    environment:
-      PMA_HOST: db
-      PMA_USER: lampuser
-      PMA_PASSWORD: lamppassword
-    depends_on:
-      - db
-    networks:
-      - lamp_network
 
 volumes:
   db_data:
-
-networks:
-  lamp_network:
-    driver: bridge
