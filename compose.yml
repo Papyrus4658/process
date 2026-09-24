@@ -1,11 +1,11 @@
 services:
   nginx:
-    image: nginx:1.31.6-alpine3.24
+    image: nginx:1.31.6-alpine3.24-slim
     ports:
       - "8080:80"
     volumes:
-      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
-      - ./php:/var/www/html
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./php/src:/var/www/html:ro
     depends_on:
       - php
     networks:
@@ -14,22 +14,32 @@ services:
   php:
     build:
       context: ./php
-      dockerfile: Containerfile
     volumes:
-      - ./php:/var/www/html
+      - ./php/src:/var/www/html
+    env_file:
+      - .env
+    depends_on:
+      db:
+        condition: service_healthy
     networks:
       - process_network
 
   db:
-    build:
-      context: .
-      dockerfile: Containerfile
-    container_name: db
-    environment:
-      MYSQL_ROOT_PASSWORD: rootpassword
-      MYSQL_DATABASE: lampdb
-      MYSQL_USER: lampuser
-      MYSQL_PASSWORD: lamppassword
+    image: mariadb:13.0.2-ubi10
+    env_file:
+      - .env
+    volumes:
+      - db_data:/var/lib/mysql
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "--protocol=TCP" ]
+      # 以下は適宜調整
+      # 起動するまでの30sは1s間隔で確認する
+      start_period: 30s
+      start_interval: 1s
+      # 起動後は30s間隔で最大5回リトライする
+      interval: 30s
+      timeout: 1s
+      retries: 5
     networks:
       - process_network
 
