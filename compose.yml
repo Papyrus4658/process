@@ -21,15 +21,7 @@ services:
       - process_network
 
   db:
-    build:
-      context: .
-      dockerfile: Containerfile
-    container_name: db
-    environment:
-      MYSQL_ROOT_PASSWORD: rootpassword
-      MYSQL_DATABASE: lampdb
-      MYSQL_USER: lampuser
-      MYSQL_PASSWORD: lamppassword
+    image: docker.io/rogue260921/mariadb:11.8.8-r0-alpine3.24
     networks:
       - process_network
 
