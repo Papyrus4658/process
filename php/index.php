@@ -1,7 +1,5 @@
 <?php
-$db = "db";
-$dbname = "lampdb";
-$host = "mariadb:host=db;dbname=lampdb";
+$host = "mysql:host=db;dbname=lampdb";
 $user = "lampuser";
 $pass = "lamppassword";
 

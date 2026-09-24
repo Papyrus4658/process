@@ -12,19 +12,24 @@ services:
       - process_network
 
   php:
-    image: php:8.2.33-fpm-alpine3.24
+    build:
+      context: ./php
+      dockerfile: Containerfile
     volumes:
       - ./php:/var/www/html
+    networks:
+      - process_network
 
   db:
-    image: rogue260921/mariadb:11.8.8-r0-alpine3.24
+    build:
+      context: .
+      dockerfile: Containerfile
+    container_name: db
     environment:
       MYSQL_ROOT_PASSWORD: rootpassword
       MYSQL_DATABASE: lampdb
       MYSQL_USER: lampuser
       MYSQL_PASSWORD: lamppassword
-    volumes:
-      - db_data:/var/lib/mariadb
     networks:
       - process_network
 
